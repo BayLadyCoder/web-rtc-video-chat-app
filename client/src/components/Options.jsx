@@ -62,7 +62,7 @@ const Options = ({ children }) => {
               <TextField
                 fullWidth
                 label='Name'
-                value={name}
+                value={name || ''}
                 onChange={(e) => setName(e.target.value)}
               />
               <CopyToClipboard text={me} className={classes.margin}>
@@ -83,7 +83,7 @@ const Options = ({ children }) => {
               <TextField
                 fullWidth
                 label='ID to Call'
-                value={idToCall}
+                value={idToCall || ''}
                 onChange={(e) => setIdTocall(e.target.value)}
               />
               {callAccepted && !callEnded ? (

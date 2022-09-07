@@ -28,16 +28,25 @@ const ContextProvider = ({ children }) => {
     socket.on('me', (id) => setMe(id));
 
     socket.on('calluser', ({ from, name: callerName, signal }) => {
-      setCall({ isReceivedCall: true, from, name: callerName, signal });
+      setCall({
+        isReceivedCall: true,
+        from,
+        name: callerName,
+        signal,
+      });
     });
   }, []);
 
-  const answerCall = () => {
+  const answerCall = (callReceiverName) => {
     setCallAccepted(true);
     const peer = new Peer({ initiator: false, trickle: false, stream });
 
     peer.on('signal', (data) => {
-      socket.emit('answercall', { signal: data, to: call.from });
+      socket.emit('answercall', {
+        signal: data,
+        to: call.from,
+        callReceiverName,
+      });
     });
 
     peer.on('stream', (currentStream) => {
@@ -65,9 +74,13 @@ const ContextProvider = ({ children }) => {
       userVideo.current.srcObject = currentStream;
     });
 
-    socket.on('callaccepted', (signal) => {
+    socket.on('callaccepted', ({ signal, callReceiverName }) => {
       setCallAccepted(true);
       peer.signal(signal);
+      setCall((prevCall) => ({
+        ...prevCall,
+        name: callReceiverName,
+      }));
     });
 
     connectionRef.current = peer;
