@@ -4,12 +4,17 @@ import { Button } from '@material-ui/core';
 import { SocketContext } from '../SocketContext';
 
 const Notifications = () => {
-  const { call, answerCall, callAccepted, name } = useContext(SocketContext);
+  const { calls, answerCall, callAccepted, name } = useContext(SocketContext);
+  if (calls.length === 0) {
+    return null;
+  }
+
+  // TODO: Update callAccepted to support multiple users
   return (
     <>
-      {call.isReceivedCall && !callAccepted && (
+      {calls[calls.length - 1].isReceivedCall && (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
-          <h1>{call.name} is calling: </h1>
+          <h1>{calls[calls.length - 1].name} is calling: </h1>
           <Button
             variant='contained'
             color='primary'

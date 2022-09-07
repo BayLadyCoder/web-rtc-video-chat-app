@@ -1,5 +1,12 @@
-import React, { useContext } from 'react';
-import { Grid, Typography, Paper } from '@material-ui/core';
+import React, {
+  useContext,
+  useRef,
+  useEffect,
+  createRef,
+  useState,
+} from 'react';
+import { Grid, Typography, Paper, IconButton } from '@material-ui/core';
+import { Mic, MicOff, Videocam, VideocamOff } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { SocketContext } from '../SocketContext';
@@ -26,11 +33,21 @@ const useStyles = makeStyles((theme) => ({
 
 const VideoPlayer = () => {
   const classes = useStyles();
-  const { name, callAccepted, myVideo, userVideo, callEnded, stream, call } =
-    useContext(SocketContext);
+  const {
+    name,
+    callAccepted,
+    myVideo,
+    callEnded,
+    stream,
+    calls,
+    userVideoRefs,
+    turnOffCamera,
+    turnOnCamera,
+  } = useContext(SocketContext);
+
   return (
     <Grid container className={classes.gridContainer}>
-      {/* Our own video */}
+      {/* My video */}
       {stream && (
         <Paper className={classes.paper}>
           <Grid item xs={12} md={6}>
@@ -45,25 +62,50 @@ const VideoPlayer = () => {
               className={classes.video}
             />
           </Grid>
+          {/* TODO: make them togglable */}
+          <IconButton>
+            <Mic />
+          </IconButton>
+          <IconButton>
+            <MicOff />
+          </IconButton>
+          <IconButton
+            onClick={(e) => {
+              e.preventDefault();
+              turnOnCamera();
+            }}
+          >
+            <Videocam />
+          </IconButton>
+          <IconButton
+            onClick={(e) => {
+              e.preventDefault();
+              turnOffCamera();
+            }}
+          >
+            <VideocamOff />
+          </IconButton>
         </Paper>
       )}
 
-      {/* User's video */}
-      {callAccepted && !callEnded && (
-        <Paper className={classes.paper}>
-          <Grid item xs={12} md={6}>
-            <Typography variant='h5' gutterBottom>
-              {call.name || "User's Name"}
-            </Typography>
-            <video
-              playsInline
-              ref={userVideo}
-              autoPlay
-              className={classes.video}
-            />
-          </Grid>
-        </Paper>
-      )}
+      {/* Users video */}
+      {callAccepted &&
+        !callEnded &&
+        calls.map((call, i) => (
+          <Paper className={classes.paper} key={i}>
+            <Grid item xs={12} md={6}>
+              <Typography variant='h5' gutterBottom>
+                {call.name || "User's Name"}
+              </Typography>
+              <video
+                playsInline
+                ref={userVideoRefs.current[i]}
+                autoPlay
+                className={classes.video}
+              />
+            </Grid>
+          </Paper>
+        ))}
     </Grid>
   );
 };
