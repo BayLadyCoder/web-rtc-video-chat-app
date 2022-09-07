@@ -45,8 +45,16 @@ const useStyles = makeStyles((theme) => ({
 
 const Options = ({ children }) => {
   const classes = useStyles();
-  const { me, callAccepted, name, setName, callEnded, leaveCall, callUser } =
-    useContext(SocketContext);
+  const {
+    me,
+    callAccepted,
+    name,
+    setName,
+    callEnded,
+    leaveCall,
+    callUser,
+    isCalling,
+  } = useContext(SocketContext);
 
   const [idToCall, setIdTocall] = useState();
 
@@ -77,16 +85,9 @@ const Options = ({ children }) => {
               </CopyToClipboard>
             </Grid>
             <Grid item xs={12} md={6} className={classes.padding}>
-              <Typography gutterBottom variant='h6'>
-                Make a Call
-              </Typography>
-              <TextField
-                fullWidth
-                label='ID to Call'
-                value={idToCall || ''}
-                onChange={(e) => setIdTocall(e.target.value)}
-              />
-              {callAccepted && !callEnded ? (
+              {isCalling ? (
+                <Typography variant='h6'>Calling...</Typography>
+              ) : callAccepted && !callEnded ? (
                 <Button
                   variant='contained'
                   color='secondary'
@@ -98,16 +99,27 @@ const Options = ({ children }) => {
                   Hang Up
                 </Button>
               ) : (
-                <Button
-                  variant='contained'
-                  color='secondary'
-                  startIcon={<Phone fontSize='large' />}
-                  fullWidth
-                  onClick={() => callUser(idToCall)}
-                  className={classes.margin}
-                >
-                  Call
-                </Button>
+                <>
+                  <Typography gutterBottom variant='h6'>
+                    Make a Call
+                  </Typography>
+                  <TextField
+                    fullWidth
+                    label='ID to Call'
+                    value={idToCall || ''}
+                    onChange={(e) => setIdTocall(e.target.value)}
+                  />
+                  <Button
+                    variant='contained'
+                    color='secondary'
+                    startIcon={<Phone fontSize='large' />}
+                    fullWidth
+                    onClick={() => callUser(idToCall)}
+                    className={classes.margin}
+                  >
+                    Call
+                  </Button>
+                </>
               )}
             </Grid>
           </Grid>
